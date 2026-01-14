@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class AppSignatureMiddleware
+{
+    /**
+     * ⚠️ IMPORTANT: Yaha apni original app ka signature hash daal do
+     * Jo aapne Step 2 me nikala tha Logcat se
+     */
+    private $VALID_SIGNATURE = "v3/DbvAkY6dUCv1KEUgmSY3IgMJ/ANDypVphFIDVknc="; // ⚠️ YE CHANGE KARO
+    
+    /**
+     * ⚠️ IMPORTANT: Apni app ka package name daal do
+     */
+    private $VALID_PACKAGE = "com.app.gameaura"; // ⚠️ YE CHANGE KARO (agar different hai to)
+    
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle(Request $request, Closure $next)
+    {
+        // Headers se signature aur package name nikalo
+        $appSignature = $request->header('X-App-Signature');
+        $packageName = $request->header('X-Package-Name');
+        
+        // Debug log (development me helpful hai)
+        \Log::info('App Signature Check', [
+            'received_signature' => $appSignature,
+            'received_package' => $packageName,
+            'expected_signature' => $this->VALID_SIGNATURE,
+            'expected_package' => $this->VALID_PACKAGE
+        ]);
+        
+        // Check 1: Signature present hai ya nahi
+        if (!$appSignature) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Unauthorized',
+                'message' => 'App Not Allowed'
+            ], 403);
+        }
+        
+        // Check 2: Signature match kar raha hai ya nahi
+        if ($appSignature !== $this->VALID_SIGNATURE) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Unauthorized',
+                'message' => 'App Not Allowed'
+            ], 403);
+        }
+        
+        // Check 3: Package name present hai ya nahi
+        if (!$packageName) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Unauthorized',
+                'message' => 'App Not Allowed'
+            ], 403);
+        }
+        
+        // Check 4: Package name match kar raha hai ya nahi
+        if ($packageName !== $this->VALID_PACKAGE) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Unauthorized',
+                'message' => 'App Not Allowed'
+            ], 403);
+        }
+        
+        // ✅ Sab checks pass - Request proceed kar sakti hai
+        return $next($request);
+    }
+}
