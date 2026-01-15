@@ -1,2 +1,5 @@
 vendor
 vendornew
+database.php
+api/.env
+application/config/config.php

@@ -6260,5 +6260,18 @@ class MemberController extends Controller {
             exit;
         }
     }
+    
+    public function getTelegramSupport() {
+        $data['telegram_support'] = DB::table('telegram_support')
+                ->where('status', '1')
+                ->select('name', 'url', DB::raw('(CASE 
+                    WHEN image = "" THEN "" 
+                    ELSE CONCAT ("' . $this->base_url . '/uploads/telegram_support_image/thumb/100x100_", image) 
+                    END) AS image'))
+                ->orderBy('date_created', 'DESC')
+                ->get();
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 
 }
