@@ -1,5 +1,15 @@
-vendor
-vendornew
-database.php
+# Dependencies
+vendor/
+vendornew/
+
+# Environment & config
 api/.env
 application/config/config.php
+database.php
+
+# Logs
+application/logs/
+*.log
+
+# Uploads
+uploads/
