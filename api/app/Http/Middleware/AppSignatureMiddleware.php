@@ -16,7 +16,7 @@ class AppSignatureMiddleware
     /**
      * ✅ Apni app ka valid package name
      */
-    private $VALID_PACKAGE = "com.app.gameaura";
+    private $VALID_PACKAGE = "com.app.gamevictory";
 
     /**
      * Handle an incoming request.
