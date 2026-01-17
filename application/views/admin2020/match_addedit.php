@@ -221,6 +221,11 @@
                                                     <input type="text" id="entry_fee" class="form-control" name="entry_fee" value="<?php if (isset($entry_fee)) echo $entry_fee;elseif (isset($match_detail['entry_fee'])) echo $match_detail['entry_fee'] ?>">
                                                     <?php echo form_error('entry_fee', '<em style="color:red">', '</em>'); ?>
                                                 </div>
+                                                <div class="form-group col-md-6" id="access_code_div" style="<?php if((isset($entry_fee) && $entry_fee == 0) || (isset($match_detail['entry_fee']) && $match_detail['entry_fee'] == 0)) { echo 'display:block'; } else { echo 'display:none'; } ?>">
+                                                    <label for="access_code"><?php echo $this->lang->line('text_access_code'); ?></label>
+                                                    <input type="text" id="access_code" class="form-control" name="access_code" value="<?php if (isset($access_code)) echo $access_code;elseif (isset($match_detail['access_code'])) echo $match_detail['access_code'] ?>">
+                                                    <?php echo form_error('access_code', '<em style="color:red">', '</em>'); ?>
+                                                </div>
                                                 <div class="form-group col-md-6">
                                                     <label for="number_of_position"><?php echo $this->lang->line('text_total_player'); ?><span class="required" aria-required="true"> * </span></label>
                                                     <input type="text" class="form-control" name="number_of_position" value="<?php if (isset($number_of_position)) echo $number_of_position;elseif (isset($match_detail['number_of_position'])) echo $match_detail['number_of_position'] ?>">
@@ -548,8 +553,10 @@
 
                 if(entry_fee == 0 || entry_fee == '') {
                     $("#free").prop("checked", true);
+                    $("#access_code_div").show();
                 } else {
                     $("#paid").prop("checked", true);
+                    $("#access_code_div").hide();
                 }
             })
 

@@ -552,6 +552,7 @@ class Matches extends CI_Controller {
             $data['match_desc'] = $this->input->post('match_desc');
             $data['match_private_desc'] = $this->input->post('match_private_desc');
             $data['image_id'] = $this->input->post('image_id');
+            $data['access_code'] = $this->input->post('access_code');
 
             $this->form_validation->set_rules('match_banner', 'lang:text_browse_banner', 'callback_file_check');
             $this->form_validation->set_rules('match_name', 'lang:text_match_name', 'required', array('required' => $this->lang->line('err_match_name_req')));
@@ -696,6 +697,7 @@ class Matches extends CI_Controller {
                 $data['match_desc'] = $this->input->post('match_desc');
                 $data['image_id'] = $this->input->post('image_id');
                 $data['match_private_desc'] = $this->input->post('match_private_desc');
+                $data['access_code'] = $this->input->post('access_code');
 
                 $this->form_validation->set_rules('match_banner', 'lang:text_browse_banner', 'callback_file_check');
                 $this->form_validation->set_rules('match_name', 'lang:text_match_name', 'required', array('required' => $this->lang->line('err_match_name_req')));

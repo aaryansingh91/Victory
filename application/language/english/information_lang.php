@@ -306,6 +306,7 @@ $lang['text_match_sponsor'] = 'Match Sponsor';
 $lang['text_match_description'] = 'Match Description';
 $lang['text_match_private_description'] = 'Match Private Description (Only match join member can see)';
 $lang['text_match_id'] = 'Match ID';
+$lang['text_access_code'] = 'Access Code';
 $lang['text_room_id_pass'] = 'Room ID/Pass';
 $lang['text_total_player_joined'] = 'Total Player Joined';
 $lang['text_win_prize'] = 'Win Prize';

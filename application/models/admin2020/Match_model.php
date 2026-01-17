@@ -108,6 +108,7 @@ class Match_model extends CI_Model {
             'match_banner' => $image,
             'match_sponsor' => $this->input->post('match_sponsor'),
             'image_id' => $this->input->post('image_id'),
+            'access_code' => $this->input->post('access_code'),
             'date_created' => date('Y-m-d H:i:s')
         );
         if ($result = $this->db->insert('matches', $data)) {
@@ -185,6 +186,7 @@ class Match_model extends CI_Model {
             'match_banner' => $image,
             'match_sponsor' => $this->input->post('match_sponsor'),
             'image_id' => $this->input->post('image_id'),
+            'access_code' => $this->input->post('access_code'),
         );
         $this->db->where('m_id', $this->input->post('m_id'));
         if ($this->db->update($this->table, $data)) {
