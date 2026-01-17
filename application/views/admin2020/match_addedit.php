@@ -151,56 +151,18 @@
                                                 </div>
                                                 <div class="form-group col-md-6">
                                                     <?php echo  $this->system->admin_profit; ?>
-                                                    <label for="win_prize"><?php echo $this->lang->line('text_prize_pool') . '(%)'; ?> <span class="required" aria-required="true"> * </span></label>
+                                                    <label for="win_prize"><?php echo $this->lang->line('text_prize_pool'); ?> <span class="required" aria-required="true"> * </span></label>
                                                     <input  type="text" class="form-control" id="win_prize" name="win_prize" value="<?php if (isset($win_prize)) echo $win_prize;elseif (isset($match_detail['win_prize'])) echo $match_detail['win_prize'] ?>">
                                                     <?php echo form_error('win_prize', '<em style="color:red">', '</em>'); ?>
-                                                    Note: Enter Price between 0 to <?php echo 100 - $this->system->admin_profit?> in Percentage.
-                                                   <br> <span id="win_prize_error" style="color: red;"></span>
+                                                    <br> <span id="win_prize_error" style="color: red;"></span>
                                                 </div> 
                                               
                                             </div>
-                                            <div class="row <?php if($Action == $this->lang->line('text_action_edit')){ echo "d-none"; } ?>">
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="result_type"><?php echo $this->lang->line('text_result_type'); ?><span class="required" aria-required="true"> * </span></label><br>
-                                                    <div class="form-group col-md-12">
-                                                        <div class="custom-control custom-radio custom-control-inline">
-                                                            <input id="percentage" name="result_type" type="radio" class="custom-control-input" value="0" <?php
-                                                            if (isset($match_detail['result_type']) && $match_detail['result_type'] == 0) {
-                                                                echo 'checked';
-                                                            } elseif (isset($result_type) && $result_type == 0) {
-                                                                echo 'checked';
-                                                            } else {
-                                                                echo 'checked';
-                                                            }
-                                                            ?>>&nbsp;
-                                                            <label class="custom-control-label" for="percentage" id="percentage_label"><?php echo $this->lang->line('text_percentage'); ?></label>
-                                                        </div>
-                                                        <div class="custom-control custom-radio custom-control-inline">
-                                                            <input id="fixed" name="result_type" type="radio" class="custom-control-input" value="1" <?php
-                                                            if (isset($match_detail['result_type']) && $match_detail['result_type'] == 1) {
-                                                                echo 'checked';
-                                                            } elseif (isset($result_type) && $result_type == 1) {
-                                                                echo 'checked';
-                                                            }
-                                                            ?> >&nbsp;
-                                                            <label class="custom-control-label" for="fixed" id="fixed_label"><?php echo $this->lang->line('text_fixed'); ?></label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <input type="hidden" name="result_type" value="1">
                                             <div class="row">
                                                 <div class="form-group col-md-6">
-                                                    <label for="per_kill"><?php echo $this->lang->line('text_per_kill') . '(%)'; ?><span class="required" aria-required="true"> * </span></label>
-                                                    <input id="per_kill" type="text" class="form-control" name="per_kill" value="<?php if (isset($per_kill)) echo $per_kill;elseif (isset($match_detail['per_kill'])) echo $match_detail['per_kill'] ?>" 
-                                                    <?php 
-                                                    if (isset($match_detail['result_type']) && $match_detail['result_type'] == 0) {
-                                                        echo "readonly";
-                                                    }
-                                                    if ($Action == $this->lang->line('text_action_add')) {
-                                                        echo "readonly";
-                                                    }
-                                                    ?>
-                                                    >
+                                                    <label for="per_kill"><?php echo $this->lang->line('text_per_kill'); ?><span class="required" aria-required="true"> * </span></label>
+                                                    <input id="per_kill" type="text" class="form-control" name="per_kill" value="<?php if (isset($per_kill)) echo $per_kill;elseif (isset($match_detail['per_kill'])) echo $match_detail['per_kill'] ?>">
                                                     <?php echo form_error('per_kill', '<em style="color:red">', '</em>'); ?>
                                                 </div>                                                
                                                 <div class="form-group col-md-6">
@@ -371,27 +333,6 @@
         <?php $this->load->view($this->path_to_view_admin . 'footer'); ?>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.js"></script>
         <script>
-            var percentageRadio = document.getElementById("percentage");
-            var fixedRadio = document.getElementById("fixed");
-            var win_prize = document.getElementById("win_prize");
-            var per_kill = document.getElementById("per_kill");
-            
-            if (percentageRadio && fixedRadio) {
-                function handlePercentageClick(event) {
-                    $("#per_kill").attr("readonly", true);
-                    win_prize.value = "";
-                    per_kill.value = "";
-                }
-                
-                function handleFixedeClick(event) {
-                    $("#per_kill").removeAttr("readonly");
-                    win_prize.value = "";
-                    per_kill.value = "";
-                }
-            
-                percentageRadio.onclick = handlePercentageClick;
-                fixedRadio.onclick = handleFixedeClick;
-            }
             
             function game_change(game_id) {
                 $.ajax({
