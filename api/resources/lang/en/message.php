@@ -101,4 +101,6 @@ return [
     'succ_follow' => 'Game Follow Successfully',
     'succ_unfollow' => 'Game Unfollow Successfully',
     'err_with_password' => 'Please choose is challenge is password protedcted or not.',
+    'err_access_code' => 'Invalid Access Code',
+    'err_access_code_req' => 'Please enter Access Code',
 ];

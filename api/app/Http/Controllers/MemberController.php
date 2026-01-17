@@ -2788,6 +2788,15 @@ class MemberController extends Controller {
             $m = DB::table('matches')
                     ->where('m_id', $request->input('match_id'))
                     ->first();
+            
+            if ($m->entry_fee == 0 && !empty($m->access_code)) {
+                if (!$request->has('access_code') || $request->input('access_code') == '') {
+                    $array['status'] = false; $array['title'] = 'Error!'; $array['message'] = trans('message.err_access_code_req'); echo json_encode($array, JSON_UNESCAPED_UNICODE); exit;
+                }
+                if ($request->input('access_code') != $m->access_code) {
+                    $array['status'] = false; $array['title'] = 'Error!'; $array['message'] = trans('message.err_access_code'); echo json_encode($array, JSON_UNESCAPED_UNICODE); exit;
+                }
+            }
             if ($m->no_of_player + count($request->input('teamposition')) > $m->number_of_position) {
                 $array['status'] = false;
                 $array['title'] = 'Error!';
