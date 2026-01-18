@@ -393,6 +393,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th><?php echo $this->lang->line('text_sr_no'); ?></th>
+                                                        <th>Match ID</th>
                                                         <th><?php echo $this->lang->line('text_match_info'); ?></th>
                                                         <th><?php echo $this->lang->line('text_paid') . ' (' . $this->functions->getPoint() . ')'; ?></th>
                                                         <th><?php echo $this->lang->line('text_won') . ' (' . $this->functions->getPoint() . ')'; ?></th>
@@ -404,6 +405,7 @@
                                                 <tfoot>
                                                     <tr>
                                                         <th><?php echo $this->lang->line('text_sr_no'); ?></th>
+                                                        <th>Match ID</th>
                                                         <th><?php echo $this->lang->line('text_match_info'); ?></th>
                                                         <th><?php echo $this->lang->line('text_paid') . ' (' . $this->functions->getPoint() . ')'; ?></th>
                                                         <th><?php echo $this->lang->line('text_won') . ' (' . $this->functions->getPoint() . ')'; ?></th>

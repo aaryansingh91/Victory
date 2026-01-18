@@ -463,18 +463,20 @@ class Members extends CI_Controller {
         $member_id = $this->uri->segment('4');
         $requestData = $_REQUEST;
         $columns = array(
-            1 => 'match_name',
-            2 => 'entry_fee',
-            3 => 'total_win',
-            4 => 'date_craeted',
+            1 => 'm_id',
+            2 => 'match_name',
+            3 => 'entry_fee',
+            4 => 'total_win',
+            5 => 'date_craeted',
         );
         $totalData = $this->members->get_list_count_MemberStates($member_id);
         $totalFiltered = $totalData;
-        $sql = "SELECT m.match_name,m.entry_fee,mj.total_win,mj.date_craeted FROM match_join_member as mj";
+        $sql = "SELECT m.m_id,m.match_name,m.entry_fee,mj.total_win,mj.date_craeted FROM match_join_member as mj";
         $sql .= " LEFT JOIN matches as m ON m.m_id = mj.match_id";
         $sql .= " WHERE member_id = " . $member_id;
         if (!empty($requestData['search']['value'])) {   // if there is a search parameter, $requestData['search']['value'] contains search parameter
-            $sql .= " AND ( m.match_name LIKE '%" . $requestData['search']['value'] . "%' ";
+            $sql .= " AND ( m.m_id LIKE '%" . $requestData['search']['value'] . "%' ";
+            $sql .= " OR  m.match_name LIKE '%" . $requestData['search']['value'] . "%' ";
             $sql .= " OR  m.entry_fee LIKE '%" . $requestData['search']['value'] . "%' ";
             $sql .= " OR  mj.total_win LIKE '%" . $requestData['search']['value'] . "%' ";
             $sql .= " OR  mj.date_craeted LIKE '%" . $requestData['search']['value'] . "%') ";
@@ -492,6 +494,7 @@ class Members extends CI_Controller {
         while ($row = mysqli_fetch_array($query)) {
             $nestedData = array();
             $nestedData[] = $i;
+            $nestedData[] = $row['m_id'];
             $nestedData[] = $row['match_name'];
             $nestedData[] = sprintf('%.' . $this->functions->getCurrencyDecimal($this->system->currency) . 'F', $row['entry_fee']);
             $nestedData[] = sprintf('%.' . $this->functions->getCurrencyDecimal($this->system->currency) . 'F', $row['total_win']);
