@@ -1434,68 +1434,60 @@ class MemberController extends Controller {
     }
 
     public function topPlayers() {
-        if (!empty($this->system_config['reset_leaderboard'])) {
-            
-            DB::statement("SET sql_mode = '' ");
-            
-            $game = DB::table('game')
-                ->select('*', DB::raw('(CASE 
-                        WHEN game_logo = "" THEN "" 
-                        ELSE CONCAT ("' . $this->base_url . '/' . $this->system_config['admin_photo'] . '/game_logo_image/thumb/200x200_", game_logo) 
-                        END) AS game_logo'))
-                ->where("status", '1')
-                ->get();
-            
-            $data['game'] = array();
-            $data['top_players'] = array();
-            
-            foreach ($game as $row) {
-                $data['top_players'][$row->game_name] = DB::table('match_join_member as mj')
-                    ->join('member as m', 'm.member_id', '=', 'mj.member_id')
-                    ->join('matches as m1', 'm1.m_id', '=', 'mj.match_id')
-                    ->where("m1.game_id", $row->game_id)
-                    ->where("m1.date_created", ">=", $this->system_config['reset_leaderboard'])
-                    ->select(DB::raw("sum(total_win) as winning"), 'm.user_name', 'm.member_id', 'm.pubg_id')
-                    ->groupBy('mj.member_id')
-                    ->orderBy('winning', 'DESC')
-                    ->take(10)
-                    ->get();
-            
-                if ($data['top_players'][$row->game_name]->count() > 0) {
-                    $data['game'][] = $row;
-                }
-            }
+        DB::statement("SET sql_mode = '' ");
+        
+        // Monthly Leaderboard
+        $data['monthly'] = DB::table('match_join_member as mj')
+            ->join('member as m', 'm.member_id', '=', 'mj.member_id')
+            ->join('matches as m1', 'm1.m_id', '=', 'mj.match_id')
+            ->whereRaw('MONTH(m1.date_created) = MONTH(CURRENT_DATE())')
+            ->whereRaw('YEAR(m1.date_created) = YEAR(CURRENT_DATE())')
+            ->select(DB::raw("sum(total_win) as winning"), 'm.user_name', 'm.member_id', 'm.pubg_id', DB::raw("MAX(m.profile_image) as profile_image"))
+            ->groupBy('mj.member_id')
+            ->orderBy('winning', 'DESC')
+            ->take(10)
+            ->get();
 
-        } else {
-            DB::statement("SET sql_mode = '' ");
-            $game = DB::table('game')
-                    ->select('*', \DB::raw('(CASE 
-                            WHEN game_logo = "" THEN "" 
-                            ELSE CONCAT ("' . $this->base_url . '/' . $this->system_config['admin_photo'] . '/game_logo_image/thumb/200x200_", game_logo) 
-                            END) AS game_logo'))
-                    ->where("status", '1')
-                    ->get();
-            $data['game'] = array();
-            $data['top_players'] = array();
-            foreach ($game as $row) {
-                $data['top_players'][$row->game_name] = DB::table('match_join_member as mj')
-                        ->join('member as m', function ($join) {
-                            $join->on('m.member_id', '=', 'mj.member_id');
-                        })
-                        ->join('matches as m1', function ($join) {
-                            $join->on('m1.m_id', '=', 'mj.match_id');
-                        })
-                        ->where("m1.game_id", $row->game_id)
-                        ->select(DB::raw("sum(total_win) as winning"), 'm.user_name', 'm.member_id', 'm.pubg_id')
-                        ->groupBy('mj.member_id')
-                        ->orderBy('winning', 'DESC')
-                        ->take(10)
-                        ->get();
-                if ($data['top_players'][$row->game_name]->count() > 0) {
-                    $data['game'][] = $row;
+        // Yearly Leaderboard
+        $data['yearly'] = DB::table('match_join_member as mj')
+            ->join('member as m', 'm.member_id', '=', 'mj.member_id')
+            ->join('matches as m1', 'm1.m_id', '=', 'mj.match_id')
+            ->whereRaw('YEAR(m1.date_created) = YEAR(CURRENT_DATE())')
+            ->select(DB::raw("sum(total_win) as winning"), 'm.user_name', 'm.member_id', 'm.pubg_id', DB::raw("MAX(m.profile_image) as profile_image"))
+            ->groupBy('mj.member_id')
+            ->orderBy('winning', 'DESC')
+            ->take(10)
+            ->get();
+
+        // Fulltime Leaderboard
+        $query = DB::table('match_join_member as mj')
+            ->join('member as m', 'm.member_id', '=', 'mj.member_id')
+            ->join('matches as m1', 'm1.m_id', '=', 'mj.match_id')
+            ->select(DB::raw("sum(total_win) as winning"), 'm.user_name', 'm.member_id', 'm.pubg_id', DB::raw("MAX(m.profile_image) as profile_image"))
+            ->groupBy('mj.member_id')
+            ->orderBy('winning', 'DESC')
+            ->take(10);
+
+        if (!empty($this->system_config['reset_leaderboard'])) {
+             $query->where("m1.date_created", ">=", $this->system_config['reset_leaderboard']);
+        }
+        
+        $data['fulltime'] = $query->get();
+
+        // Process profile images for all lists
+        $processImages = function(&$list) {
+            foreach ($list as $key => $row) {
+                if ($row->profile_image == "") {
+                     $list[$key]->profile_image = ""; // Or default image logic
+                } else {
+                     $list[$key]->profile_image = $this->base_url . '/' . $this->system_config['admin_photo'] . '/profile_image/thumb/200x200_' . $row->profile_image;
                 }
             }
-        }
+        };
+
+        $processImages($data['monthly']);
+        $processImages($data['yearly']);
+        $processImages($data['fulltime']);
 
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit;
