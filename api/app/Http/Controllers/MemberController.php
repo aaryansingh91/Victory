@@ -1436,22 +1436,22 @@ class MemberController extends Controller {
     public function topPlayers() {
         DB::statement("SET sql_mode = '' ");
         
-        // Monthly Leaderboard
-        $data['monthly'] = DB::table('match_join_member as mj')
+        // Weekly Leaderboard
+        $data['weekly'] = DB::table('match_join_member as mj')
             ->join('member as m', 'm.member_id', '=', 'mj.member_id')
             ->join('matches as m1', 'm1.m_id', '=', 'mj.match_id')
-            ->whereRaw('MONTH(m1.date_created) = MONTH(CURRENT_DATE())')
-            ->whereRaw('YEAR(m1.date_created) = YEAR(CURRENT_DATE())')
+            ->whereRaw('YEARWEEK(m1.date_created, 1) = YEARWEEK(CURRENT_DATE(), 1)')
             ->select(DB::raw("sum(total_win) as winning"), 'm.user_name', 'm.member_id', 'm.pubg_id', DB::raw("MAX(m.profile_image) as profile_image"))
             ->groupBy('mj.member_id')
             ->orderBy('winning', 'DESC')
             ->take(10)
             ->get();
 
-        // Yearly Leaderboard
-        $data['yearly'] = DB::table('match_join_member as mj')
+        // Monthly Leaderboard
+        $data['monthly'] = DB::table('match_join_member as mj')
             ->join('member as m', 'm.member_id', '=', 'mj.member_id')
             ->join('matches as m1', 'm1.m_id', '=', 'mj.match_id')
+            ->whereRaw('MONTH(m1.date_created) = MONTH(CURRENT_DATE())')
             ->whereRaw('YEAR(m1.date_created) = YEAR(CURRENT_DATE())')
             ->select(DB::raw("sum(total_win) as winning"), 'm.user_name', 'm.member_id', 'm.pubg_id', DB::raw("MAX(m.profile_image) as profile_image"))
             ->groupBy('mj.member_id')
@@ -1485,8 +1485,8 @@ class MemberController extends Controller {
             }
         };
 
+        $processImages($data['weekly']);
         $processImages($data['monthly']);
-        $processImages($data['yearly']);
         $processImages($data['fulltime']);
 
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
