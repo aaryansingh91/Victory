@@ -2789,13 +2789,11 @@ class MemberController extends Controller {
                     ->where('m_id', $request->input('match_id'))
                     ->first();
             
-            
             if ($m->entry_fee == 0 && !empty($m->access_code)) {
-                $providedCode = trim($request->input('access_code', ''));
-                if (empty($providedCode)) {
+                if (!$request->has('access_code') || $request->input('access_code') == '') {
                     $array['status'] = false; $array['title'] = 'Error!'; $array['message'] = trans('message.err_access_code_req'); echo json_encode($array, JSON_UNESCAPED_UNICODE); exit;
                 }
-                if (trim($m->access_code) !== $providedCode) {
+                if ($request->input('access_code') != $m->access_code) {
                     $array['status'] = false; $array['title'] = 'Error!'; $array['message'] = trans('message.err_access_code'); echo json_encode($array, JSON_UNESCAPED_UNICODE); exit;
                 }
             }
