@@ -517,8 +517,6 @@
             ?>">
                     <ul class="nav flex-column ml-3">
                         <?php
-                            <?php
-                        }
                         if ($this->functions->check_permission('wallet_offer')) {
                             ?>
                             <li class="nav-item">
