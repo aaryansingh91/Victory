@@ -3940,6 +3940,8 @@ class MemberController extends Controller {
                         'join_money' => $join_money];
                     DB::table('member')->where('member_id', $row->member_id)->update($upd_data);
 
+                    $this->applyWalletOffer($row->member_id, $request->input('amount'), $join_money);
+
                     $array['status'] = true;
                     $array['title'] = 'Success!';
                     $array['message'] = trans('message.text_succ_balance_added');
@@ -4125,6 +4127,8 @@ class MemberController extends Controller {
                 'join_money' => $join_money];
             DB::table('member')->where('member_id', Auth::user()->member_id)->update($upd_data);
 
+            $this->applyWalletOffer(Auth::user()->member_id, $request->input('amount'), $join_money);
+
             $array['status'] = true;
             $array['title'] = 'Success!';
             $array['message'] = trans('message.text_succ_balance_added');
@@ -4207,6 +4211,8 @@ class MemberController extends Controller {
                 $upd_data = [
                     'join_money' => $join_money];
                 DB::table('member')->where('member_id', $request->input('member_id'))->update($upd_data);
+
+                $this->applyWalletOffer($request->input('member_id'), $request->input('amount'), $join_money);
 
                 $array['status'] = true;
                 $array['title'] = 'Success!';
@@ -4302,6 +4308,8 @@ class MemberController extends Controller {
                         'join_money' => $join_money];
                     DB::table('member')->where('member_id', $request->input('member_id'))->update($upd_data);
 
+                    $this->applyWalletOffer($request->input('member_id'), $request->input('amount'), $join_money);
+
                     $array['status'] = true;
                     $array['title'] = 'Success!';
                     $array['message'] = trans('message.text_succ_balance_added');
@@ -4395,6 +4403,8 @@ class MemberController extends Controller {
                     'join_money' => $join_money];
                 DB::table('member')->where('member_id', $row->member_id)->update($upd_data);
 
+                $this->applyWalletOffer($row->member_id, $data->deposit_amount, $join_money);
+
                 $array['status'] = true;
                 $array['title'] = 'Success!';
                 $array['message'] = trans('message.text_succ_balance_added');
@@ -4477,6 +4487,8 @@ class MemberController extends Controller {
             $upd_data = [
                 'join_money' => $join_money];
             DB::table('member')->where('member_id', $request->input('member_id'))->update($upd_data);
+
+            $this->applyWalletOffer($request->input('member_id'), $request->input('amount'), $join_money);
 
             $array['status'] = true;
             $array['title'] = 'Success!';
@@ -4668,6 +4680,8 @@ class MemberController extends Controller {
         
         $upd_data = ['join_money' => $join_money];
         DB::table('member')->where('member_id', $request->input('member_id'))->update($upd_data);
+
+        $this->applyWalletOffer($request->input('member_id'), $request->input('amount'), $join_money);
         
         $array['status'] = true;
         $array['title'] = 'Success!';
@@ -6273,6 +6287,57 @@ class MemberController extends Controller {
                 ->get();
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit;
+    }
+
+    public function getWalletOffers() {
+        $offers = DB::table('wallet_offers')
+                ->where('status', '1')
+                ->orderBy('offer_amount', 'ASC')
+                ->get();
+        return response()->json(['status' => true, 'offers' => $offers]);
+    }
+
+    public function applyWalletOffer($member_id, $amount, $current_join_money) {
+        $offer = DB::table('wallet_offers')
+                ->where('offer_amount', $amount)
+                ->where('status', '1')
+                ->first();
+        if ($offer) {
+            $extra_coins = $offer->extra_coins;
+            $new_join_money = $current_join_money + $extra_coins;
+            
+            // Log in accountstatement
+            $row = DB::table('member')->where('member_id', $member_id)->first();
+            $browser = '';
+            $agent = new Agent();
+            if ($agent->isMobile()) {
+                $browser = $agent->platform() . ' ' . $agent->device() . ' ' . $agent->version($agent->device());
+            } elseif ($agent->isDesktop()) {
+                $browser = $agent->platform() . ' ' . $agent->browser() . ' ' . $agent->version($agent->browser());
+            }
+            $ip = $this->getIp();
+            $acc_data = [
+                'member_id' => $member_id,
+                'pubg_id' => $row->pubg_id,
+                'deposit' => $extra_coins,
+                'withdraw' => 0,
+                'join_money' => $new_join_money,
+                'win_money' => $row->wallet_balance,
+                'note' => 'Wallet Offer Extra Coins ('.$offer->offer_amount.')',
+                'note_id' => '0', 
+                'entry_from' => '1',
+                'ip_detail' => $ip,
+                'browser' => $browser,
+                'accountstatement_dateCreated' => Carbon::createFromFormat('Y-m-d H:i:s',date('Y-m-d H:i:s'), 'UTC')->setTimezone($this->timezone)->format('Y-m-d H:i:s')
+            ];
+            DB::table('accountstatement')->insert($acc_data);
+            
+            // Update member join_money again
+            DB::table('member')->where('member_id', $member_id)->update(['join_money' => $new_join_money]);
+            
+            return $new_join_money;
+        }
+        return $current_join_money;
     }
 
 }

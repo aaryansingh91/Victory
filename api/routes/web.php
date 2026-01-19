@@ -62,6 +62,7 @@ $router->group(['prefix' => '', 'middleware' => 'lang'], function () use ($route
     $router->get('about_us', 'MemberController@aboutUs');
     $router->get('terms_conditions', 'MemberController@termsConditions');
     $router->get('telegram_support', 'MemberController@getTelegramSupport');
+    $router->get('wallet_offers', 'MemberController@getWalletOffers');
 });
 
 // ========================================================================

@@ -517,15 +517,16 @@
             ?>">
                     <ul class="nav flex-column ml-3">
                         <?php
-                        if ($this->functions->check_permission('appsetting')) {
+                            <?php
+                        }
+                        if ($this->functions->check_permission('wallet_offer')) {
                             ?>
                             <li class="nav-item">
-                                <a class="nav-link <?php
-                                if (($this->uri->segment('2') == 'appsetting'))
-                                    echo 'active';
-                                ?>" href="<?php echo base_url() . $this->path_to_view_admin ?>appsetting/">
-                                    <i class="fa fa-android"></i>
-                                    <?php echo $this->lang->line('text_appsetting'); ?>
+                                <a class="nav-link <?php if ($this->uri->segment('2') == 'wallet_offer')
+                                    echo 'active'; ?>"
+                                    href="<?php echo base_url() . $this->path_to_view_admin ?>wallet_offer/">
+                                    <i class="fa fa-gift"></i>
+                                    Wallet Offers
                                 </a>
                             </li>
                             <?php
