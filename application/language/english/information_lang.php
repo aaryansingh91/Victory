@@ -657,4 +657,11 @@ $lang['text_licence_note'] = 'If you purchased BattleMania code other than <a hr
 $lang['min_price'] = 'Minimum Price';
 $lang['max_price'] = 'Maximum Price';
 
+$lang['text_bulk_duplicate'] = 'Bulk Duplicate';
+$lang['text_no_of_matches'] = 'No. of Matches';
+$lang['text_time_interval'] = 'Time Interval (Minutes)';
+$lang['text_succ_bulk_add_match'] = 'Bulk Matches added successfully';
+$lang['text_err_bulk_add_match'] = 'Error in adding bulk matches';
+$lang['text_source_match'] = 'Source Match';
+
 ?>

@@ -177,12 +177,13 @@ class Matches extends CI_Controller {
                         . '<option value="4" selected>Cancel</option></select>';
             }
             $edit = '<a class="" style="font-size:18px;" data-original-title="Edit" data-placement="top"  href=' . base_url() . $this->path_to_view_admin . 'matches/edit/' . $row['m_id'] . '><i class="fa fa-edit"></i></a>&nbsp;';
+            $bulk_duplicate = '<a class="" style="font-size:18px;" data-original-title="Bulk Duplicate" data-placement="top"  href=' . base_url() . $this->path_to_view_admin . 'matches/bulk_duplicate/' . $row['m_id'] . '><i class="fa fa-copy"></i></a>&nbsp;';
             if ($this->system->demo_user == 1 && $row['m_id'] <= 7) {
                 $delete = '<a class = "" disabled="disabled" data-original-title = "Delete" data-placement = "top" style = "font-size:18px;color:#007bff" ><i class = "fa fa-trash-o"></i> </a>&nbsp;';
             } else {
                 $delete = '<a class = "" data-original-title = "Delete" data-placement = "top" style = "cursor: pointer;font-size:18px;color:#007bff" onClick = "javascript: confirmDeleteMember(document.frmmatchlist,' . $row['m_id'] . ');"><i class = "fa fa-trash-o"></i> </a>&nbsp;';
             }
-            $nestedData[] = $edit . $delete;
+            $nestedData[] = $edit . $bulk_duplicate . $delete;
             if ($row['pin_match'] == 1)
                 $pin = '<a class = "" data-original-title = "Unpin" data-placement = "top" style = "cursor: pointer;font-size:18px;color:#007bff" onClick = "javascript: changePin(document.frmmatchlist,' . $row['m_id'] . ',0);"><i class="fa fa-thumb-tack" aria-hidden="true"></i></a>';
             else
@@ -792,6 +793,48 @@ class Matches extends CI_Controller {
                 $array['message'] = $this->lang->line('text_player_name_not_changed');
                 echo json_encode($array);
                 exit;
+            }
+        }
+    }
+
+    function bulk_duplicate() {
+        if(!$this->functions->check_permission('matches_edit')) {
+            $this->session->set_flashdata('error', $this->lang->line('text_err_edit_match'));
+            redirect($this->path_to_view_admin . 'matches');
+        }
+
+        $data['match_bulk_duplicate'] = true;
+        $m_id = $this->uri->segment('4');
+        $data['title'] = $this->lang->line('text_bulk_duplicate');
+        $data['match_detail'] = $this->matches->getmatchById($m_id);
+        $this->load->view($this->path_to_view_admin . 'match_bulk_duplicate', $data);
+    }
+
+    function insert_bulk_duplicate() {
+        if(!$this->functions->check_permission('matches_edit')) {
+            $this->session->set_flashdata('error', $this->lang->line('text_err_edit_match'));
+            redirect($this->path_to_view_admin . 'matches');
+        }
+
+        if ($this->input->post('submit') == $this->lang->line('text_btn_submit')) {
+            $this->form_validation->set_rules('no_of_matches', 'lang:text_no_of_matches', 'required|numeric|greater_than[0]');
+            $this->form_validation->set_rules('interval', 'lang:text_time_interval', 'required|numeric|greater_than[0]');
+
+            if ($this->form_validation->run() == FALSE) {
+                $m_id = $this->input->post('m_id');
+                $data['match_detail'] = $this->matches->getmatchById($m_id);
+                $this->load->view($this->path_to_view_admin . 'match_bulk_duplicate', $data);
+            } else {
+                $m_id = $this->input->post('m_id');
+                $no_of_matches = $this->input->post('no_of_matches');
+                $interval = $this->input->post('interval');
+
+                if ($this->matches->bulk_duplicate_insert($m_id, $no_of_matches, $interval)) {
+                    $this->session->set_flashdata('notification', $this->lang->line('text_succ_bulk_add_match'));
+                } else {
+                    $this->session->set_flashdata('error', $this->lang->line('text_err_bulk_add_match'));
+                }
+                redirect($this->path_to_view_admin . 'matches/');
             }
         }
     }

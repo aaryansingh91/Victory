@@ -412,4 +412,43 @@ class Match_model extends CI_Model {
         return true;
     }
 
+    public function bulk_duplicate_insert($m_id, $no_of_matches, $interval) {
+        $source_match = $this->getmatchById($m_id);
+        if (!$source_match) return false;
+
+        $format = 'd/m/Y h:i a';
+        $base_dt = DateTime::createFromFormat($format, $source_match['match_time']);
+        
+        if (!$base_dt) {
+            // Fallback if the format is somehow different (e.g. ISO from DB)
+            $base_dt = new DateTime($source_match['match_time']);
+        }
+
+        $success_count = 0;
+
+        for ($i = 1; $i <= $no_of_matches; $i++) {
+            $interval_minutes = $i * $interval;
+            $new_dt = clone $base_dt;
+            $new_dt->modify("+$interval_minutes minutes");
+            $new_time = $new_dt->format($format);
+            
+            $data = $source_match;
+            unset($data['m_id']); // Remove primary key
+            
+            $data['match_time'] = $new_time;
+            $data['no_of_player'] = 0; // Reset joined players
+            $data['match_status'] = '1'; // Set as Active
+            $data['date_created'] = date('Y-m-d H:i:s');
+            $data['room_description'] = ''; // Clear room info for new matches
+            $data['pin_match'] = '0';
+            $data['result_notification'] = '';
+
+            if ($this->db->insert($this->table, $data)) {
+                $success_count++;
+            }
+        }
+
+        return ($success_count == $no_of_matches);
+    }
+
 }
