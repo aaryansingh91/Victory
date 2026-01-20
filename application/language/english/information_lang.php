@@ -663,5 +663,6 @@ $lang['text_time_interval'] = 'Time Interval (Minutes)';
 $lang['text_succ_bulk_add_match'] = 'Bulk Matches added successfully';
 $lang['text_err_bulk_add_match'] = 'Error in adding bulk matches';
 $lang['text_source_match'] = 'Source Match';
+$lang['text_err_bulk_duplicate_permission'] = 'You do not have permission to use bulk duplicate';
 
 ?>

@@ -177,7 +177,10 @@ class Matches extends CI_Controller {
                         . '<option value="4" selected>Cancel</option></select>';
             }
             $edit = '<a class="" style="font-size:18px;" data-original-title="Edit" data-placement="top"  href=' . base_url() . $this->path_to_view_admin . 'matches/edit/' . $row['m_id'] . '><i class="fa fa-edit"></i></a>&nbsp;';
-            $bulk_duplicate = '<a class="" style="font-size:18px;" data-original-title="Bulk Duplicate" data-placement="top"  href=' . base_url() . $this->path_to_view_admin . 'matches/bulk_duplicate/' . $row['m_id'] . '><i class="fa fa-copy"></i></a>&nbsp;';
+            $bulk_duplicate = '';
+            if($this->functions->check_permission('matches_bulk_duplicate')) {
+                $bulk_duplicate = '<a class="" style="font-size:18px;" data-original-title="Bulk Duplicate" data-placement="top"  href=' . base_url() . $this->path_to_view_admin . 'matches/bulk_duplicate/' . $row['m_id'] . '><i class="fa fa-copy"></i></a>&nbsp;';
+            }
             if ($this->system->demo_user == 1 && $row['m_id'] <= 7) {
                 $delete = '<a class = "" disabled="disabled" data-original-title = "Delete" data-placement = "top" style = "font-size:18px;color:#007bff" ><i class = "fa fa-trash-o"></i> </a>&nbsp;';
             } else {
@@ -798,8 +801,8 @@ class Matches extends CI_Controller {
     }
 
     function bulk_duplicate() {
-        if(!$this->functions->check_permission('matches_edit')) {
-            $this->session->set_flashdata('error', $this->lang->line('text_err_edit_match'));
+        if(!$this->functions->check_permission('matches_bulk_duplicate')) {
+            $this->session->set_flashdata('error', $this->lang->line('text_err_bulk_duplicate_permission'));
             redirect($this->path_to_view_admin . 'matches');
         }
 
@@ -811,8 +814,8 @@ class Matches extends CI_Controller {
     }
 
     function insert_bulk_duplicate() {
-        if(!$this->functions->check_permission('matches_edit')) {
-            $this->session->set_flashdata('error', $this->lang->line('text_err_edit_match'));
+        if(!$this->functions->check_permission('matches_bulk_duplicate')) {
+            $this->session->set_flashdata('error', 'You do not have permission to use bulk duplicate');
             redirect($this->path_to_view_admin . 'matches');
         }
 
