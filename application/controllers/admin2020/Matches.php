@@ -635,13 +635,13 @@ class Matches extends CI_Controller {
                         $this->db->where('m.m_id', $this->input->post('m_id'));
                         $qr = $this->db->get('matches as m');
                         $match = $qr->row_array();
-                        $message = strip_tags("Room Detail Updated for {$match['match_name']}, {$data['room_description']} from {$this->system->company_name}.");
+                        $message = strip_tags("Room Detail Updated for {$match['match_name']}. {$data['room_description']} from {$this->system->company_name}.");
                         if (!empty($data['player_ids'])) {
                             // Loop through each player_id and send notification individually
                             foreach ($data['player_ids'] as $player_id) {
                                 $this->functions->sendMessageFCM(
                                     "ROOM ID & PASSWORD UPDATED",                                                    // $title
-                                    "Room Detail Updated for " . $match['match_name'] . ". {$message}", // $message
+                                    $message,                                                                        // $message
                                     '',                                                                              // $image_url (empty)
                                     $player_id                                                                       // $registration_ids (single token)
                                 );
@@ -650,7 +650,7 @@ class Matches extends CI_Controller {
                          if ($this->system->msg91_otp == '1' || $this->system->msg91_otp == 1) {
                             foreach ($mem_country as $mem) {
                                 $m_number = $mem->country_code . $mem->mobile_no;
-                                $message = "Dear " . $mem->first_name . ",\nRoom Detail Updated for " . $match['match_name'] . "\nPlease Check from" . $this->system->company_name . "\n" . base_url();
+                                $message = "Dear " . $mem->first_name . ",\nRoom Detail Updated for " . $match['match_name'] . "\nPlease Check from " . $this->system->company_name . "\n" . base_url();
                                 $curl = curl_init();
                                 curl_setopt_array($curl, array(
                                     CURLOPT_URL => "http://api.msg91.com/api/sendhttp.php?sender=" . $this->system_config['msg91_sender'] . "&route=" . $this->system_config['msg91_route'] . "&mobiles=" . $m_number . "&authkey=" . $this->system->msg91_authkey . "&encrypt=0&country=" . $mem->country_code . "&message=" . urlencode($message) . "&response=json",
